@@ -15,7 +15,7 @@ L82""".splitlines()
 
 
 def run_puzzle(puzzle_input: list[str], start: int = 50) -> tuple[int, int]:
-    """How many times does the pudialzzle point at 0?"""
+    """How many times does the dial point at 0?"""
     dial = deque(range(100))
     dial.rotate(start)
     p1_count = 0
