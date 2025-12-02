@@ -26,7 +26,7 @@ def part_two(puzzle: str) -> int:
         for pk in range(start, end + 1):
             pk_str = str(pk)
             length = len(pk_str)
-            for span in range(1, length):
+            for span in range(1, length // 2 + 1):
                 if length % span:
                     # not a clean multiple
                     continue
