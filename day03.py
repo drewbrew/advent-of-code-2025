@@ -15,6 +15,7 @@ def part_one(puzzle: str, number_of_batteries: int = 2) -> int:
         while len(digits_accrued) < number_of_batteries:
             batteries_remaining = number_of_batteries - len(digits_accrued)
             max_next_digit = max(
+                # need this to avoid off-by-one issues because [:0] gives an empty string
                 line[last_digit_index:]
                 if batteries_remaining == 1
                 else line[last_digit_index : -(batteries_remaining - 1)]
