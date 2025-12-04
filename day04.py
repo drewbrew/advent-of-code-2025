@@ -34,31 +34,24 @@ def is_roll_accessible(x: int, y: int, grid: set[tuple[int, int]]) -> bool:
     ]
     return sum(neighbor in grid for neighbor in neighbors) < 4
 
+def find_accessible_rolls(grid: set[tuple[int, int]]) -> set[tuple[int, int]]:
+    return {(x, y) for (x, y) in grid if is_roll_accessible(x, y, grid)}
+
 
 def part_1(puzzle: str) -> int:
     """How many rolls are surrounded by fewer than 4 other rolls?"""
     grid = parse_input(puzzle=puzzle)
-    result = 0
-    for x, y in grid:
-        if is_roll_accessible(x, y, grid):
-            result += 1
-    return result
+    return len(find_accessible_rolls(grid))
 
 
 def part_2(puzzle: str) -> int:
     """Keep removing rolls until no further rolls are accessible"""
     grid = parse_input(puzzle=puzzle)
-    rolls_removed = set()
-    while True:
-        rolls_removed_this_turn = set()
-        for x, y in list(grid):
-            if is_roll_accessible(x, y, grid):
-                rolls_removed_this_turn.add((x, y))
-                grid.remove((x, y))
-        if not rolls_removed_this_turn:
-            # done
-            return len(rolls_removed)
-        rolls_removed |= rolls_removed_this_turn
+    rolls_removed = 0
+    while (rolls_removed_this_turn := find_accessible_rolls(grid)) != set():
+        rolls_removed += len(rolls_removed_this_turn)
+        grid ^= rolls_removed_this_turn
+    return rolls_removed
 
 
 def main():
