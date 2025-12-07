@@ -10,6 +10,6 @@ fastest or best solutions, but they work.
 
 ## How do I run them?
 
-Download and install Python 3.14. You'll need to install uv and run `uv sync`.
+Download and install Python 3.13. You'll need to install uv and run `uv sync`.
 
 Save your day's input as `dayXX.txt`, then run `uv run python dayXX.py`.
