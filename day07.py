@@ -20,28 +20,13 @@ TEST_INPUT = """.......S.......
 ..............."""
 
 
-def part_one(puzzle: str) -> int:
-    """how many tachyon beams form?"""
-    lines = puzzle.splitlines()
-    beams = {lines[0].index("S")}
-    max_x = len(lines[0])
-    splits = 0
-    for line in lines[1:]:
-        for beam in list(beams):
-            if line[beam] == "^":
-                beams.remove(beam)
-                assert beam not in (0, max_x)
-                beams |= {beam + 1, beam - 1}
-                splits += 1
-    return splits
-
-
-def part_two(puzzle: str) -> int:
+def run_puzzle(puzzle: str) -> tuple[int, int]:
     lines = puzzle.splitlines()
     beams = defaultdict(int)
-    # instead of just having a set of beams (above),
-    # count the number of ways we can reach that splitter
+    # count the number of ways we can reach that splitter (part 2)
     beams[lines[0].index("S")] = 1
+    # and the number of splits (part 1)
+    splits = 0
     max_x = len(lines[0])
     for line in lines[1:]:
         for beam in list(beams):
@@ -52,17 +37,18 @@ def part_two(puzzle: str) -> int:
                 # to the child
                 beams[beam + 1] += routes
                 beams[beam - 1] += routes
-    return sum(beams.values())
+                # part 1 result
+                splits += 1
+    return splits, sum(beams.values())
 
 
 def main():
-    part_one_result = part_one(TEST_INPUT)
+    part_one_result, part_two_result = run_puzzle(TEST_INPUT)
     assert part_one_result == 21, part_one_result
-    puzzle = Path("day07.txt").read_text()
-    print(part_one(puzzle=puzzle))
-    part_two_result = part_two(TEST_INPUT)
     assert part_two_result == 40, part_two_result
-    print(part_two(puzzle))
+    puzzle = Path("day07.txt").read_text()
+    part_two_result = run_puzzle(TEST_INPUT)
+    print("\n".join(str(i) for i in run_puzzle(puzzle)))
 
 
 if __name__ == "__main__":
