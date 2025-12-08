@@ -52,7 +52,7 @@ def nearest_neighbor(
     return (x2, y2, z2), min_dist
 
 
-def part_one_result(graph: networkx.graph) -> int:
+def part_one_result(graph: networkx.Graph) -> int:
     networks = []
     nodes_seen = set()
     for node in graph.nodes:
