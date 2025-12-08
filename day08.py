@@ -38,9 +38,10 @@ def nearest_neighbor(
     x, y, z = point
     min_dist = 1_000_000_000_000
     x2 = y2 = z2 = -1
-    # print(f"{point} is connected to {already_connected_node}")
     for x1, y1, z1 in nodes:
         if x1 == x and y1 == y and z1 == z or graph.has_edge((x1, y1, z1), (x, y, z)):
+            # exclude the node itself and nodes which are already directly connected to this
+            # node
             continue
         if (dist := cartesian_distance(x, y, z, x1, y1, z1)) < min_dist:
             min_dist = dist
