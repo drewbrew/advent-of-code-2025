@@ -52,24 +52,7 @@ def nearest_neighbor(
     return (x2, y2, z2), min_dist
 
 
-def part_one(puzzle: str, num_connections: int = 10):
-    nodes = {tuple(int(i) for i in line.split(",")) for line in puzzle.splitlines()}
-    graph = networkx.Graph()
-    unconnected_nodes = {node: nearest_neighbor(node, nodes, graph) for node in nodes}
-    while len(graph.edges) < num_connections:
-        for node, (neighbor, dist) in sorted(
-            unconnected_nodes.items(), key=lambda item: item[1][1]
-        ):
-            if graph.has_edge(node, neighbor):
-                continue
-            # print(
-            #     f"connecting {node} to {neighbor} (distance {dist:.2f}), {len(graph.edges)}"
-            # )
-            graph.add_edge(node, neighbor)
-            unconnected_nodes[node] = nearest_neighbor(node, nodes, graph)
-            unconnected_nodes[neighbor] = nearest_neighbor(neighbor, nodes, graph)
-            break
-
+def part_one_result(graph: networkx.graph) -> int:
     networks = []
     nodes_seen = set()
     for node in graph.nodes:
@@ -84,15 +67,18 @@ def part_one(puzzle: str, num_connections: int = 10):
     return prod(networks[:3])
 
 
-def part_two(puzzle: str):
+def run_puzzle(puzzle: str, part_one_connections: int = 10) -> tuple[int, int]:
     nodes = {tuple(int(i) for i in line.split(",")) for line in puzzle.splitlines()}
     graph = networkx.Graph()
     unconnected_nodes = {node: nearest_neighbor(node, nodes, graph) for node in nodes}
     a_node = list(nodes)[0]
     node_count = len(nodes)
+    part_one_final = -1
     while a_node not in graph.nodes or (
         len(networkx.descendants(graph, a_node)) + 1 < node_count
     ):
+        if len(graph.edges) == part_one_connections:
+            part_one_final = part_one_result(graph)
         for node, (neighbor, dist) in sorted(
             unconnected_nodes.items(), key=lambda item: item[1][1]
         ):
@@ -106,17 +92,17 @@ def part_two(puzzle: str):
             unconnected_nodes[neighbor] = nearest_neighbor(neighbor, nodes, graph)
             break
     # print("done", node, neighbor)
-    return node[0] * neighbor[0]
+    return part_one_final, node[0] * neighbor[0]
 
 
 def main():
-    part_one_result = part_one(TEST_INPUT, 10)
+    part_one_result, part_two_result = run_puzzle(TEST_INPUT, 10)
     assert part_one_result == 40, part_one_result
-    puzzle = Path("day08.txt").read_text()
-    print(part_one(puzzle, 1000))
-    part_two_result = part_two(TEST_INPUT)
     assert part_two_result == 25272, part_two_result
-    print(part_two(puzzle))
+    puzzle = Path("day08.txt").read_text()
+    part_one_result, part_two_result = run_puzzle(puzzle, 1000)
+    print(part_one_result)
+    print(part_two_result)
 
 
 if __name__ == "__main__":
