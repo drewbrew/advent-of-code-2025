@@ -72,7 +72,9 @@ def run_puzzle(puzzle: str, part_one_connections: int = 10) -> tuple[int, int]:
     graph = networkx.Graph()
     unconnected_nodes = {node: nearest_neighbor(node, nodes, graph) for node in nodes}
     # pick the node farthest away from everyone else for speed (saves about a second)
-    a_node = sorted(unconnected_nodes.items(), key=lambda k: k[1][1], reverse=True)[0][0]
+    a_node = sorted(unconnected_nodes.items(), key=lambda k: k[1][1], reverse=True)[0][
+        0
+    ]
     node_count = len(nodes)
     part_one_final = -1
     while a_node not in graph.nodes or (
