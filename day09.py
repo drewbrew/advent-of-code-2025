@@ -1,7 +1,5 @@
 """Day 9: movie theater tile decorations"""
-
-from concurrent.futures import ProcessPoolExecutor
-from functools import lru_cache, partial
+from functools import partial
 from itertools import combinations
 from multiprocessing import Manager, Pool
 from multiprocessing.shared_memory import ShareableList
@@ -185,14 +183,23 @@ def is_valid_rectangle(
 
 def part_two(puzzle: str) -> int:
     lines = [line.split(",") for line in puzzle.splitlines()]
+    if puzzle != TEST_INPUT:
+        # use a minimum value to speed things up
+        # my answer for part 1 was on the order of 4.7 trillion, so
+        # 200 million seems like a reasonable floor
+        AREA_LIST[0] = 200_000_000
     nodes = tuple((int(x), int(y)) for x, y in lines)
     perimeter = frozenset(generate_perimeter(nodes))
     # print(f"{sorted(perimeter)=}")
     manager = Manager()
     cache = manager.dict()
-    func = partial(generate_area, perimeter=perimeter, cache=cache,)
+    func = partial(
+        generate_area,
+        perimeter=perimeter,
+        cache=cache,
+    )
     with Pool() as executor:
-        areas = executor.map(func, combinations(nodes, 2))
+        areas = executor.map(func, combinations(nodes, 2), chunksize=100)
     return max(areas)
 
 
