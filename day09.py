@@ -2,13 +2,8 @@
 from functools import partial
 from itertools import combinations
 from multiprocessing import Manager, Pool
-from multiprocessing.shared_memory import ShareableList
 from pathlib import Path
 
-try:
-    AREA_LIST = ShareableList([-1], name="AREALIST")
-except FileExistsError:
-    AREA_LIST = ShareableList(name="AREALIST")
 
 TEST_INPUT = """7,1
 11,1
@@ -183,20 +178,20 @@ def is_valid_rectangle(
 
 def part_two(puzzle: str) -> int:
     lines = [line.split(",") for line in puzzle.splitlines()]
-    if puzzle != TEST_INPUT:
-        # use a minimum value to speed things up
-        # my answer for part 1 was on the order of 4.7 trillion, so
-        # 200 million seems like a reasonable floor
-        AREA_LIST[0] = 200_000_000
     nodes = tuple((int(x), int(y)) for x, y in lines)
     perimeter = frozenset(generate_perimeter(nodes))
     # print(f"{sorted(perimeter)=}")
     manager = Manager()
     cache = manager.dict()
+    # use a minimum value to speed things up
+    # my answer for part 1 was on the order of 4.7 trillion, so
+    # 200 million seems like a reasonable floor
+    smallest_area = manager.list([-1 if puzzle == TEST_INPUT else 200_000_000])
     func = partial(
         generate_area,
         perimeter=perimeter,
         cache=cache,
+        smallest_area =smallest_area
     )
     with Pool() as executor:
         areas = executor.map(func, combinations(nodes, 2), chunksize=100)
@@ -207,15 +202,16 @@ def generate_area(
     points: tuple[tuple[int, int], tuple[int, int]],
     perimeter: frozenset[tuple[int, int]],
     cache: dict[int, tuple[frozenset[tuple[int, int]]]],
+    smallest_area: list[int],
 ) -> int:
     point1, point2 = points
-    if area(point1, point2) < AREA_LIST[0]:
-        print(f"too small between {point1} and {point2}")
+    if area(point1, point2) < smallest_area[0]:
+        print(f"too small between {point1} and {point2} (smallest area {smallest_area[0]})")
         return -1
     if is_valid_rectangle(point1, point2, perimeter, cache):
         area_used = area(point1, point2)
         print(f"/// found area from {point1} to {point2}: {area_used}")
-        AREA_LIST[0] = max(AREA_LIST[0], area_used)
+        smallest_area[0] = max(smallest_area[0], area_used)
         return area_used
     return -1
 
