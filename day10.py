@@ -93,7 +93,7 @@ def part_two(puzzle: str) -> int:
         variables = []
         joltage_variables = [None for _ in range(len(joltage))]
         for index, group in enumerate(switch_groups):
-            var = z3.Int(chr(ord('a') + index))
+            var = z3.Int(chr(ord("a") + index))
             solver.add(var >= 0)
             variables.append(var)
             for target in group:
@@ -109,7 +109,7 @@ def part_two(puzzle: str) -> int:
             # print(f'adding {joltage_variables[index]} == {value}')
             solver.add(joltage_variables[index] == value)
         total_presses = solver.minimize(sum(variables))
-        assert solver.check() == z3.sat, 'failed?'
+        assert solver.check() == z3.sat, "failed?"
         # print(switch_groups, joltage, total_presses)
         answer += total_presses.value().as_long()
 
