@@ -1,6 +1,8 @@
 import heapq
 from pathlib import Path
 
+import z3
+
 TEST_INPUT = """[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
 [...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}
 [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}"""
@@ -65,13 +67,17 @@ def part_one(puzzle: str) -> int:
     for target, switch_groups in lines:
         # print(f'{target=}, {switch_groups=}')
         state = 0
+        states_seen = set()
         search = [(1, do_invert(state, group)) for group in switch_groups]
         heapq.heapify(search)
         while True:
             step_count, state = heapq.heappop(search)
-            print(step_count, end="\r")
+            if state in states_seen:
+                continue
+            states_seen.add(state)
+            # print(step_count, end="\r")
             if state == target:
-                print("\ndone", step_count)
+                # print("\ndone", step_count)
                 answer += step_count
                 break
             for group in switch_groups:
@@ -79,59 +85,34 @@ def part_one(puzzle: str) -> int:
     return answer
 
 
-def push_button_p2(state: list[int], buttons: list[int]) -> list[int]:
-    result = state[:]
-    for button in buttons:
-        result[button] += 1
-    return result
-
-
 def part_two(puzzle: str) -> int:
     lines = parse_input_part_2(puzzle=puzzle)
     answer = 0
     for switch_groups, joltage in lines:
-        # print(f'{target=}, {switch_groups=}')
-        state = [0 for _ in range(len(joltage))]
-        button_presses = [0 for _ in range(len(switch_groups))]
-        max_presses = [1000 for _ in range(len(switch_groups))]
-        seen_states = set()
-        for index, targets in enumerate(switch_groups):
-            # for each button, the highest number of times it can be pressed
-            # is the lowest joltage of any of its outputs
-            max_presses[index] = min(joltage[target] for target in targets)
-        print(max_presses)
-        search = []
+        solver = z3.Optimize()
+        variables = []
+        joltage_variables = [None for _ in range(len(joltage))]
         for index, group in enumerate(switch_groups):
-            button_presses = button_presses[:]
-            button_presses[index] += 1
-            search.append((1, push_button_p2(state, group), button_presses))
-        heapq.heapify(search)
-        while True:
-            try:
-                step_count, state, button_presses = heapq.heappop(search)
-            except IndexError:
-                print('\n oh no!!!')
-                raise
-            if tuple(button_presses) in seen_states:
-                # already been here
+            var = z3.Int(chr(ord('a') + index))
+            solver.add(var >= 0)
+            variables.append(var)
+            for target in group:
+                # set up the a + b + c from above
+                if joltage_variables[target] is None:
+                    joltage_variables[target] = var
+                else:
+                    joltage_variables[target] = joltage_variables[target] + var
+        # print(joltage_variables)
+        for index, value in enumerate(joltage):
+            if joltage_variables[index] is None:
                 continue
-            print(f'{step_count}, {len(search)}, {button_presses}     ', end="\r")
-            seen_states.add(tuple(button_presses))
-            if state == joltage:
-                print("\ndone", step_count)
-                answer += step_count
-                break
-            if any(
-                level > target_level for level, target_level in zip(state, joltage)
-            ) or any(
-                press_count >= limit + 2
-                for press_count, limit in zip(button_presses, max_presses)
-            ):
-                # print("pruning")
-                continue
-            for index, group in enumerate(switch_groups):
-                interim_presses = [p if index != pi else p + 1 for pi, p in enumerate(button_presses)]
-                heapq.heappush(search, (step_count + 1, push_button_p2(state, group), interim_presses))
+            # print(f'adding {joltage_variables[index]} == {value}')
+            solver.add(joltage_variables[index] == value)
+        total_presses = solver.minimize(sum(variables))
+        assert solver.check() == z3.sat, 'failed?'
+        # print(switch_groups, joltage, total_presses)
+        answer += total_presses.value().as_long()
+
     return answer
 
 
