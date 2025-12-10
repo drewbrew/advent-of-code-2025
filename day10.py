@@ -93,7 +93,7 @@ def part_two(puzzle: str) -> int:
         # print(f'{target=}, {switch_groups=}')
         state = [0 for _ in range(len(joltage))]
         button_presses = [0 for _ in range(len(switch_groups))]
-        max_presses = [100 for _ in range(len(switch_groups))]
+        max_presses = [1000 for _ in range(len(switch_groups))]
         seen_states = set()
         for index, targets in enumerate(switch_groups):
             # for each button, the highest number of times it can be pressed
@@ -112,10 +112,10 @@ def part_two(puzzle: str) -> int:
             except IndexError:
                 print('\n oh no!!!')
                 raise
-            print(f'{step_count}, {len(search)}, {button_presses}     ', end="\r")
             if tuple(button_presses) in seen_states:
                 # already been here
                 continue
+            print(f'{step_count}, {len(search)}, {button_presses}     ', end="\r")
             seen_states.add(tuple(button_presses))
             if state == joltage:
                 print("\ndone", step_count)
@@ -123,12 +123,14 @@ def part_two(puzzle: str) -> int:
                 break
             if any(
                 level > target_level for level, target_level in zip(state, joltage)
+            ) or any(
+                press_count >= limit + 2
+                for press_count, limit in zip(button_presses, max_presses)
             ):
                 # print("pruning")
                 continue
             for index, group in enumerate(switch_groups):
-                interim_presses = button_presses[:]
-                interim_presses[index] += 1
+                interim_presses = [p if index != pi else p + 1 for pi, p in enumerate(button_presses)]
                 heapq.heappush(search, (step_count + 1, push_button_p2(state, group), interim_presses))
     return answer
 
