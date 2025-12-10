@@ -5,6 +5,15 @@ TEST_INPUT = """[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
 [...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}
 [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}"""
 
+# part 2 is a weird system of equations:
+# for line 1 above, let a, b, c, d, e, f be the press count for each of the
+# 6 buttons (a is (3), b is (1, 3), ...)
+# so the equation form looks like:
+# 3 = e + f
+# 5 = b + f
+# 4 = c + d + e
+# 7 = a + b + d
+
 
 def parse_input(puzzle: str) -> list[tuple[int, int]]:
     result = []
@@ -83,20 +92,44 @@ def part_two(puzzle: str) -> int:
     for switch_groups, joltage in lines:
         # print(f'{target=}, {switch_groups=}')
         state = [0 for _ in range(len(joltage))]
-        search = [(1, push_button_p2(state, group)) for group in switch_groups]
+        button_presses = [0 for _ in range(len(switch_groups))]
+        max_presses = [100 for _ in range(len(switch_groups))]
+        seen_states = set()
+        for index, targets in enumerate(switch_groups):
+            # for each button, the highest number of times it can be pressed
+            # is the lowest joltage of any of its outputs
+            max_presses[index] = min(joltage[target] for target in targets)
+        print(max_presses)
+        search = []
+        for index, group in enumerate(switch_groups):
+            button_presses = button_presses[:]
+            button_presses[index] += 1
+            search.append((1, push_button_p2(state, group), button_presses))
         heapq.heapify(search)
         while True:
-            step_count, state = heapq.heappop(search)
-            print(step_count, end="\r")
+            try:
+                step_count, state, button_presses = heapq.heappop(search)
+            except IndexError:
+                print('\n oh no!!!')
+                raise
+            print(f'{step_count}, {len(search)}, {button_presses}     ', end="\r")
+            if tuple(button_presses) in seen_states:
+                # already been here
+                continue
+            seen_states.add(tuple(button_presses))
             if state == joltage:
                 print("\ndone", step_count)
                 answer += step_count
                 break
-            if any(level > target_level for level, target_level in zip(state, joltage)):
+            if any(
+                level > target_level for level, target_level in zip(state, joltage)
+            ):
                 # print("pruning")
                 continue
-            for group in switch_groups:
-                heapq.heappush(search, (step_count + 1, push_button_p2(state, group)))
+            for index, group in enumerate(switch_groups):
+                interim_presses = button_presses[:]
+                interim_presses[index] += 1
+                heapq.heappush(search, (step_count + 1, push_button_p2(state, group), interim_presses))
     return answer
 
 
