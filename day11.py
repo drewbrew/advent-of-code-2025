@@ -116,7 +116,7 @@ def graph_to_dot(graph: networkx.DiGraph) -> str:
 
 
 def part_two(puzzle: str) -> int:
-    """How many paths from you to out?"""
+    """How many paths from svr to out that go through both dac and fft?"""
 
     graph = networkx.DiGraph()
     for line in puzzle.splitlines():
