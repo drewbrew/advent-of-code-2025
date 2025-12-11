@@ -81,16 +81,13 @@ def paths_from_a_to_b(
     cache: dict[tuple[str, str], int],
 ) -> int:
     # time for some recursion!
-    # print(f'{source=}, {dest=}')
-    if source == dest:
-        # print('end')
-        return 1
     try:
         result = cache[source, dest]
     except KeyError:
 
         result = sum(
             paths_from_a_to_b(graph, node2, dest, cache)
+            if dest != node2 else 1
             for node1, node2 in graph.edges
             if node1 == source
         )
