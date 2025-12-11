@@ -1,3 +1,4 @@
+from itertools import cycle
 import multiprocessing
 from pathlib import Path
 import subprocess
@@ -28,6 +29,38 @@ dac: fff
 fff: ggg hhh
 ggg: out
 hhh: out"""
+
+
+# SVG color scheme with white-ish colors removed
+COLORS = """aliceblue	aqua	aquamarine	azure
+bisque	black	blue
+blueviolet	brown	burlywood	cadetblue	chartreuse
+chocolate	coral	cornflowerblue	crimson
+cyan	darkblue	darkcyan	darkgoldenrod	darkgray
+darkgreen	darkgrey	darkkhaki	darkmagenta	darkolivegreen
+darkorange	darkorchid	darkred	darksalmon	darkseagreen
+darkslateblue	darkslategray	darkslategrey	darkturquoise	darkviolet
+deeppink	deepskyblue	dimgray	dimgrey	dodgerblue
+firebrick	forestgreen	fuchsia
+gold	goldenrod	gray	grey
+green	greenyellow	honeydew	hotpink	indianred
+indigo	ivory	khaki	lavender	lavenderblush
+lawngreen	lemonchiffon	lightblue	lightcoral	lightcyan
+lightgoldenrodyellow	lightgray	lightgreen	lightgrey	lightpink
+lightsalmon	lightseagreen	lightskyblue	lightslategray	lightslategrey
+lightsteelblue	lightyellow	lime	limegreen
+magenta	maroon	mediumaquamarine	mediumblue	mediumorchid
+mediumpurple	mediumseagreen	mediumslateblue	mediumspringgreen	mediumturquoise
+mediumvioletred	midnightblue	mintcream	mistyrose	moccasin
+navy	oldlace	olive	olivedrab
+orange	orangered	orchid	palegoldenrod	palegreen
+paleturquoise	palevioletred	papayawhip	peachpuff	peru
+pink	plum	powderblue	purple	red
+rosybrown	royalblue	saddlebrown	salmon	sandybrown
+seagreen	seashell	sienna	silver	skyblue
+slateblue	slategray	slategrey	snow	springgreen
+steelblue	tan	teal	thistle	tomato
+turquoise	violet	wheat   yellow	yellowgreen""".split()
 
 
 def part_one(puzzle: str) -> int:
@@ -65,10 +98,11 @@ def paths_from_a_to_b(
     return result
 
 
-def graph_to_dot(graph: networkx.Graph) -> str:
-    output = ["graph {"]
+def graph_to_dot(graph: networkx.DiGraph) -> str:
+    output = ["digraph {", "    node [colorscheme=svg]"]
+    colors = cycle(COLORS)
     for node1, node2 in graph.edges:
-        output.append(f"    {node1} -- {node2}")
+        output.append(f'    {node1} -> {node2} [color="{next(colors)}"]')
     output.append("}")
     return "\n".join(output)
 
