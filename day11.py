@@ -75,22 +75,25 @@ def part_one(puzzle: str) -> int:
 
 
 def paths_from_a_to_b(
-    graph: networkx.DiGraph,
     source: str,
     dest: str,
     cache: dict[tuple[str, str], int],
+    children: dict[str, list[str]],
 ) -> int:
     # time for some recursion!
     try:
         result = cache[source, dest]
     except KeyError:
+        try:
+            result = sum(
+                paths_from_a_to_b(node2, dest, cache, children) if dest != node2 else 1
+                for node2 in children[source]
+            )
+        except KeyError:
+            # we got to out but weren't looking for it
+            # don't cache it though because we will be looking for it another time
+            result = 0
 
-        result = sum(
-            paths_from_a_to_b(graph, node2, dest, cache)
-            if dest != node2 else 1
-            for node1, node2 in graph.edges
-            if node1 == source
-        )
         cache[source, dest] = result
 
     # if source in ['svr', 'dac', 'fft']:
@@ -104,6 +107,7 @@ def graph_to_dot(graph: networkx.DiGraph) -> str:
         "    node [colorscheme=svg]",
         '    fft [color="red",shape=box,style=filled]',
         '    dac [color="blue",shape=box,style=filled]',
+        '    you [color="green",style=filled]',
     ]
     colors = cycle(COLORS)
     for node1, node2 in graph.edges:
@@ -114,13 +118,17 @@ def graph_to_dot(graph: networkx.DiGraph) -> str:
 
 def part_two(puzzle: str) -> int:
     """How many paths from svr to out that go through both dac and fft?"""
-
-    graph = networkx.DiGraph()
+    children = {}
+    visualize = puzzle != PART_TWO_TEST_INPUT
+    if visualize:
+        graph = networkx.DiGraph()
     for line in puzzle.splitlines():
         source, dests = line.split(": ")
-        for dest in dests.split():
-            graph.add_edge(source, dest)
-    if puzzle != PART_TWO_TEST_INPUT:
+        if visualize:
+            for dest in dests.split():
+                graph.add_edge(source, dest)
+        children[source] = dests.split()
+    if visualize:
         dotfile = "day11.dot"
         Path(dotfile).write_text(graph_to_dot(graph))
         try:
@@ -141,9 +149,9 @@ def part_two(puzzle: str) -> int:
     manager = multiprocessing.Manager()
     cache = manager.dict()
     args_list = [
-        (graph, "svr", "fft", cache),
-        (graph, "fft", "dac", cache),
-        (graph, "dac", "out", cache),
+        ("svr", "fft", cache, children),
+        ("fft", "dac", cache, children),
+        ("dac", "out", cache, children),
     ]
     with multiprocessing.Pool() as pool:
         (
