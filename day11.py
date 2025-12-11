@@ -31,24 +31,24 @@ ggg: out
 hhh: out"""
 
 
-# SVG color scheme with white-ish colors removed
-COLORS = """aliceblue	aqua	aquamarine	azure
+# SVG color scheme with white-ish and hard-to-see colors removed
+COLORS = """aqua	aquamarine	azure
 bisque	black	blue
 blueviolet	brown	burlywood	cadetblue	chartreuse
 chocolate	coral	cornflowerblue	crimson
-cyan	darkblue	darkcyan	darkgoldenrod	darkgray
+cyan	darkblue	darkcyan	darkgoldenrod
 darkgreen	darkgrey	darkkhaki	darkmagenta	darkolivegreen
 darkorange	darkorchid	darkred	darksalmon	darkseagreen
-darkslateblue	darkslategray	darkslategrey	darkturquoise	darkviolet
-deeppink	deepskyblue	dimgray	dimgrey	dodgerblue
+darkslateblue	darkslategrey	darkturquoise	darkviolet
+deeppink	deepskyblue	dimgrey	dodgerblue
 firebrick	forestgreen	fuchsia
-gold	goldenrod	gray	grey
+gold	goldenrod	grey
 green	greenyellow	honeydew	hotpink	indianred
-indigo	ivory	khaki	lavender	lavenderblush
-lawngreen	lemonchiffon	lightblue	lightcoral	lightcyan
-lightgoldenrodyellow	lightgray	lightgreen	lightgrey	lightpink
-lightsalmon	lightseagreen	lightskyblue	lightslategray	lightslategrey
-lightsteelblue	lightyellow	lime	limegreen
+indigo	ivory	khaki	lavender
+lawngreen	lightblue	lightcoral	lightcyan
+lightgreen	lightgrey	lightpink
+lightsalmon	lightseagreen	lightskyblue	lightslategrey
+lightsteelblue	lime	limegreen
 magenta	maroon	mediumaquamarine	mediumblue	mediumorchid
 mediumpurple	mediumseagreen	mediumslateblue	mediumspringgreen	mediumturquoise
 mediumvioletred	midnightblue	mintcream	mistyrose	moccasin
@@ -57,8 +57,8 @@ orange	orangered	orchid	palegoldenrod	palegreen
 paleturquoise	palevioletred	papayawhip	peachpuff	peru
 pink	plum	powderblue	purple	red
 rosybrown	royalblue	saddlebrown	salmon	sandybrown
-seagreen	seashell	sienna	silver	skyblue
-slateblue	slategray	slategrey	snow	springgreen
+seagreen	sienna	silver	skyblue
+slateblue	slategrey	springgreen
 steelblue	tan	teal	thistle	tomato
 turquoise	violet	wheat   yellow	yellowgreen""".split()
 
