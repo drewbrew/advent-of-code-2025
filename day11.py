@@ -91,7 +91,6 @@ def paths_from_a_to_b(
             )
         except KeyError:
             # we got to out but weren't looking for it
-            # don't cache it though because we will be looking for it another time
             result = 0
 
         cache[source, dest] = result
