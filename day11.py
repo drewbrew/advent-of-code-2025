@@ -102,7 +102,12 @@ def paths_from_a_to_b(
 
 
 def graph_to_dot(graph: networkx.DiGraph) -> str:
-    output = ["digraph {", "    node [colorscheme=svg]"]
+    output = [
+        "digraph {",
+        "    node [colorscheme=svg]",
+        '    fft [color="red",shape=box,style=filled]',
+        '    dac [color="blue",shape=box,style=filled]',
+    ]
     colors = cycle(COLORS)
     for node1, node2 in graph.edges:
         output.append(f'    {node1} -> {node2} [color="{next(colors)}"]')
