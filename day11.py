@@ -75,7 +75,10 @@ def part_one(puzzle: str) -> int:
 
 
 def paths_from_a_to_b(
-    graph: networkx.DiGraph, source: str, dest: str, cache: dict[tuple[str, str], int],
+    graph: networkx.DiGraph,
+    source: str,
+    dest: str,
+    cache: dict[tuple[str, str], int],
 ) -> int:
     # time for some recursion!
     # print(f'{source=}, {dest=}')
