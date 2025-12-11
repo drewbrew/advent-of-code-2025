@@ -134,7 +134,7 @@ def part_two(puzzle: str) -> int:
             assert not output.stderr, output.stderr
             Path("day11.svg").write_bytes(output.stdout)
             print("take a look at day11.svg")
-            print("if fft is below dac, everything here will break")
+            print("if fft (red) is below dac (blue), everything here will break")
 
     # need to look at:
     # svr -> fft (without hitting dac) -> dac -> out (possible)
