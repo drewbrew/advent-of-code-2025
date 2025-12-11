@@ -127,7 +127,7 @@ def part_two(puzzle: str) -> int:
         dotfile = "day11.dot"
         Path(dotfile).write_text(graph_to_dot(graph))
         try:
-            output = subprocess.run(["dot", "-Tsvg", "day11.dot"], capture_output=True)
+            output = subprocess.run(["dot", "-Tsvg", dotfile], capture_output=True)
         except FileNotFoundError:
             print("Unable to write svg. Install graphviz and try again")
         else:
