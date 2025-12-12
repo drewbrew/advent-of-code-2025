@@ -1,6 +1,1 @@
-input*.txt
-day*.txt
-day*.png
-.venv
-*.svg
-*.dot
+__pycache__
